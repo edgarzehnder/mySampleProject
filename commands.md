@@ -19,6 +19,8 @@
 - `cd ios` and `pod install --repo-update`
 - `cd ..` and `npx react-native run-ios`
 
+**Finish feat/1-add-firebase**
+
 ## add call
 
 - add to **app.tsx** `import * as React from 'react'; import { Text } from 'react-native';import auth from '@react-native-firebase/auth'; `
