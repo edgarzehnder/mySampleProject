@@ -12,6 +12,7 @@
 ## add firebase
 
 - `yarn add @react-native-firebase/app`
+- `yarn add @react-native-firebase/auth`
 - open `mySampleProject.xcworkspace` copy bundleidentifier
 - in xcode add file to mySampleProject and add plist
 - open **AppDelegate.m** and add `#import <Firebase.h>`on the top
