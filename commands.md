@@ -8,3 +8,17 @@
 ## create-react-native-app
 
 - `cd "/Users/edgar/Documents/ownProjects/mySampleProject" && npx react-native run-ios`
+
+## add firebase
+
+- `yarn add @react-native-firebase/app`
+- open `mySampleProject.xcworkspace` copy bundleidentifier
+- in xcode add file to mySampleProject and add plist
+- open **AppDelegate.m** and add `#import <Firebase.h>`on the top
+  - in `(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions` add `if ([FIRApp defaultApp] == nil) { [FIRApp configure]; }`
+- `cd ios` and `pod install --repo-update`
+- `cd ..` and `npx react-native run-ios`
+
+## add call
+
+- add to **app.tsx** `import * as React from 'react'; import { Text } from 'react-native';import auth from '@react-native-firebase/auth'; `
