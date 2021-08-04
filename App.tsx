@@ -15,19 +15,18 @@ import firestore from '@react-native-firebase/firestore';
 
 import {
   Alert,
-  Button,
   FlatList,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -80,12 +79,14 @@ const App = () => {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar />
       <View style={styles.sectionContainer}>
         {user ? (
           <>
             <Text style={styles.title}>Welcome {user.email}</Text>
-            <Button onPress={handleLogout} title="Logout" />
+            <TouchableOpacity style={styles.button} onPress={handleLogout}>
+              <Text>Logout</Text>
+            </TouchableOpacity>
             {user && food && (
               <View>
                 <FlatList
@@ -117,7 +118,9 @@ const App = () => {
               secureTextEntry
               onChangeText={pw => setPassword(pw)}
             />
-            <Button onPress={handleSubmit} title="Submit" />
+            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+              <Text>Submit</Text>
+            </TouchableOpacity>
           </>
         )}
       </View>
@@ -144,7 +147,6 @@ const styles = StyleSheet.create({
   },
   list: {
     flexDirection: 'column',
-    margin: 15,
   },
   listItem: {
     flexDirection: 'column',
@@ -152,6 +154,14 @@ const styles = StyleSheet.create({
     padding: 15,
     borderWidth: 1,
     borderColor: 'black',
+  },
+  button: {
+    borderWidth: 1,
+    borderColor: 'blue',
+    margin: 15,
+    padding: 15,
+    fontSize: 20,
+    alignItems: 'center',
   },
 });
 
