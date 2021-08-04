@@ -13,6 +13,8 @@
 
 - `yarn add @react-native-firebase/app`
 - `yarn add @react-native-firebase/auth`
+- `yarn add @react-native-firebase/firestore`
+
 - open `mySampleProject.xcworkspace` copy bundleidentifier
 - in xcode add file to mySampleProject and add plist
 - open **AppDelegate.m** and add `#import <Firebase.h>`on the top
@@ -25,3 +27,8 @@
 ## add call
 
 - add to **app.tsx** `import * as React from 'react'; import { Text } from 'react-native';import auth from '@react-native-firebase/auth'; `
+
+## add calls
+
+- Sammlungs-ID -> food
+- id, name, store

@@ -11,12 +11,13 @@
 import React, {useEffect, useState} from 'react';
 
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 import {
   Alert,
   Button,
+  FlatList,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -25,63 +26,41 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
-
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
-  const [loading, setLoading] = useState<boolean>(true);
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [food, setFood] = useState<{name: string; store: string}[]>([]);
+
+  const loadFood = async () => {
+    try {
+      const collection =
+        firestore().collection<{name: string; store: string}>('food');
+
+      const foodResult = await collection.get();
+
+      const foodItems: {name: string; store: string}[] = [];
+
+      foodResult.docs.forEach(item => {
+        foodItems.push(item.data());
+      });
+
+      setFood(foodItems);
+    } catch (err) {
+      Alert.alert(err.code);
+    }
+  };
 
   useEffect(() => {
     auth().onAuthStateChanged(userState => {
       setUser(userState);
-
-      if (loading) {
-        setLoading(false);
-      }
     });
   }, []);
 
-  const backgroundStyle = {
-    flex: 1,
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  useEffect(() => {
+    !!user && loadFood();
+  }, [user]);
 
   const handleSubmit = async () => {
     try {
@@ -95,37 +74,53 @@ const App = () => {
     auth().signOut();
   };
 
+  const backgroundStyle = {
+    flex: 1,
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View style={styles.sectionContainer}>
-          {user ? (
-            <>
-              <Text style={styles.title}>Welcome {user.email}</Text>
-              <Button onPress={handleLogout} title="Logout" />
-            </>
-          ) : (
-            <>
-              <Text style={styles.title}>Welcome Stranger</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="email"
-                onChangeText={mail => setEmail(mail)}
-              />
-              <TextInput
-                style={styles.textInput}
-                placeholder="Password"
-                secureTextEntry
-                onChangeText={pw => setPassword(pw)}
-              />
-              <Button onPress={handleSubmit} title="Submit" />
-            </>
-          )}
-        </View>
-      </ScrollView>
+      <View style={styles.sectionContainer}>
+        {user ? (
+          <>
+            <Text style={styles.title}>Welcome {user.email}</Text>
+            <Button onPress={handleLogout} title="Logout" />
+            {user && food && (
+              <View>
+                <FlatList
+                  style={styles.list}
+                  keyExtractor={item => item.name}
+                  data={food}
+                  renderItem={({item}) => (
+                    <View style={styles.listItem}>
+                      <Text>
+                        {item.name} {item.store}
+                      </Text>
+                    </View>
+                  )}
+                />
+              </View>
+            )}
+          </>
+        ) : (
+          <>
+            <Text style={styles.title}>Welcome Stranger</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="email"
+              onChangeText={mail => setEmail(mail)}
+            />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Password"
+              secureTextEntry
+              onChangeText={pw => setPassword(pw)}
+            />
+            <Button onPress={handleSubmit} title="Submit" />
+          </>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -140,11 +135,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textInput: {
-    flex: 1,
     padding: 15,
     borderWidth: 1,
     borderColor: 'black',
+    color: 'black',
     margin: 15,
+    lineHeight: 15,
+  },
+  list: {
+    flexDirection: 'column',
+    margin: 15,
+  },
+  listItem: {
+    flexDirection: 'column',
+    margin: 15,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: 'black',
   },
 });
 
